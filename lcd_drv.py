@@ -1,6 +1,7 @@
-# MicroPython SSD1306 OLED driver, I2C and SPI interfaces
+# MicroPython LS013B4DN04  OLED driver, SPI interfaces
 import framebuf
 import utime
+import os
 
 # register definitions
 MLCD_WR = const(0x01) # MLCD write line command
@@ -40,6 +41,17 @@ class LS013B4DN04(framebuf.FrameBuffer):
         self.spi.write(bytes([cmd, 0x00, 0x00]))
         self.cs.value(0)
 
+    def drawBMP(self,file,x,y):
+        with open(file , 'rb') as f: # portable bitmap file format
+            f.readline() # Magic number, P1 ASCII, P4 Binary
+            while True:
+                l = f.readline()
+                if l[0] != "#" :break
+            dims=l.decode("utf-8").rstrip().split(" ") # Dimensions
+            data = bytearray(f.read())
+        print(dims)
+        fbuf = framebuf.FrameBuffer(data, int(dims[0]), int(dims[1]), framebuf.MONO_HLSB) #framebuf.MONO_HMSB
+        self.blit(fbuf, x, y)
     def write_data(self, buf):
 		for line in range (1,PIXELS_Y):
 			dataLine=bytearray()
@@ -68,14 +80,5 @@ if __name__ == "__main__":
     display.text("hello word",10,20)
     display.hline(0,10,96, 1)
     display.show()
-    with open('icon/bluetooth.pbm', 'rb') as f:
-        f.readline() # Magic number
-        while True:
-            l = f.readline()
-            if l[0] != "#" :break
-        f.readline() # Dimensions
-        data = bytearray(f.read())
-    print(len(data))
-    fbuf = framebuf.FrameBuffer(data, 16, 16, framebuf.MONO_HMSB)
-    display.blit(fbuf, 0, 0)
+    display.drawBMP('icons/person.pbm',10,10)
     display.show()
