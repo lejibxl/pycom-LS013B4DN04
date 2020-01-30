@@ -46,7 +46,8 @@ class LS013B4DN04(framebuf.FrameBuffer):
             f.readline() # Magic number, P1 ASCII, P4 Binary
             while True:
                 l = f.readline()
-                if l[0] != "#" :break
+                if l[0] != 35 :break # 35=#
+            print(l[0],l)
             dims=l.decode("utf-8").rstrip().split(" ") # Dimensions
             data = bytearray(f.read())
         print(dims)
@@ -80,5 +81,6 @@ if __name__ == "__main__":
     display.text("hello word",10,20)
     display.hline(0,10,96, 1)
     display.show()
-    display.drawBMP('icons/person.pbm',10,10)
+    display.drawBMP('icons/test.pbm',10,10)
+    display.drawBMP('icons/person.pbm',40,10)
     display.show()
